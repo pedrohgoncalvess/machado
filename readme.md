@@ -1,6 +1,3 @@
-Assistant's Response: Here's a README for your SQL migration tool "Machado":
-
-```markdown
 # Machado 🪓
 
 A elegant and lightweight SQL migration tool designed for simplicity and efficiency.
