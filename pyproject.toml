@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "machado"
 version = "0.1.0"
@@ -11,4 +15,32 @@ dependencies = [
     "mccabe>=0.7.0",
     "pep8-naming>=0.14.1",
     "pytest>=8.3.4",
+    "python-dotenv>=1.0.1"
 ]
+
+[project.scripts]
+machado = "machado.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3

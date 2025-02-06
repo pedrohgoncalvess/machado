@@ -21,5 +21,6 @@ Note:
     - Test classes should start with 'Test'
 """
 
+
 def test_basic():
     assert 1 + 1 == 2
