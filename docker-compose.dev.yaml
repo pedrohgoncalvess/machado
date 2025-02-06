@@ -1,0 +1,20 @@
+version: '3'
+services:
+  template-db:
+    image: postgres
+    restart: no
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5435:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - standard-network
+
+networks:
+  standard-network:
+
+volumes:
+  pg_data:
