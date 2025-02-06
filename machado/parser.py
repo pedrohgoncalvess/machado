@@ -6,7 +6,8 @@ providing easy access to configuration settings across the application.
 """
 
 import configparser
-from typing import Any, Dict
+import os.path
+from configparser import NoSectionError
 
 
 class ConfigParser:
@@ -21,27 +22,52 @@ class ConfigParser:
         """
         self.config = configparser.ConfigParser()
         self.config_file = config_file
-        self._load_config()
+        self._load_config_()
 
-    def _load_config(self) -> None:
+        if not os.path.exists(config_file):
+            raise Exception("Configuration file not found. Try machado init command.")
+
+    def _load_config_(self) -> None:
         """Load the configuration file."""
         try:
             self.config.read(self.config_file)
+        except FileNotFoundError as _:
+            raise Exception("Configuration file not found. Try machado init command.")
         except configparser.Error as e:
             raise Exception(f"Error reading config file: {e}")
 
-    def default_config(self) -> Dict[str, Any]:
+    def project_config(self) -> dict[str, any]:
         """
-        Get default configuration settings.
+        Get project configuration settings.
 
         Returns:
-            Dict[str, Any]: Dictionary containing database settings.
+            dict[str, any]: Dictionary containing database settings.
         """
-        database_config = self.config["Database"]
+        project_config = self.config["project"]
         return {
-            "table_name": database_config["table_name"],
-            "timeout": database_config["timeout"],
-            "attempts": database_config["retry_attempts"]
+            "name": project_config["name"],
+            "migration_path": project_config["migration_path"]
         }
 
-print(ConfigParser().default_config())
+    def database_config(self) -> dict[str, any]:
+        """
+        Get database configuration settings.
+
+        Returns:
+            dict[str, any]: Dictionary containing database settings.
+        """
+        try:
+            database_config = self.config["database"]
+            return {
+                "table_name": database_config.get("table_name", "machado"),
+                "timeout": database_config.get("timeout", "20"),
+                "attempts": database_config.get("retry_attempts", "3"),
+                "driver": database_config.get("driver"),
+                "port": database_config.get("port", "5432"),
+                "host": database_config.get("host", "localhost"),
+                "name": database_config.get("name", "postgres"),
+                "user": database_config.get("user", "postgres"),
+                "password": database_config.get("password", "admin")
+            }
+        except (NoSectionError, KeyError) as _:
+            return {}
