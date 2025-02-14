@@ -6,7 +6,6 @@ import shortuuid
 
 from machado.config.parser import ConfigParser
 from machado.utils.path_config import project_root, project
-from machado.utils.path_project import project_path
 
 
 def main(migration_type: str, message: str) -> None:
