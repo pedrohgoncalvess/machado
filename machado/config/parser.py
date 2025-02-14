@@ -49,6 +49,20 @@ class ConfigParser:
             "migration_path": project_config["migration_path"]
         }
 
+
+    def migration_config(self) -> dict[str, any]:
+        """
+        Get project configuration settings.
+
+        Returns:
+            dict[str, any]: Dictionary containing database settings.
+        """
+        migration_config = self.config["migration"]
+
+        return {
+            "py_example": False if migration_config.get("py_example") == "false" else True
+        }
+
     def database_config(self) -> dict[str, any]:
         """
         Get database configuration settings.
@@ -67,7 +81,7 @@ class ConfigParser:
                 "host": database_config.get("host", "localhost"),
                 "name": database_config.get("name", "postgres"),
                 "user": database_config.get("user", "postgres"),
-                "password": database_config.get("password", "admin")
+                "password": database_config.get("password", "admin"),
             }
         except (NoSectionError, KeyError) as _:
             return {}
