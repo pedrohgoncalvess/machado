@@ -10,7 +10,7 @@ def main(migration_path: str) -> None:
     config_file = os.path.join(current_dir, "machado.conf")
 
     if os.path.exists(config_file):
-        raise FileExistsError("Config file already exists.")
+        raise FileExistsError("[Machado]: Config file already exists.")
 
     with resources.path("machado.templates", "machado.conf") as config_template:
         shutil.copy2(str(config_template), config_file)
@@ -18,7 +18,7 @@ def main(migration_path: str) -> None:
     migration_dir = os.path.join(migration_path, "migration")
 
     if os.path.exists(migration_dir):
-        raise FileExistsError("Migration directory already exists.")
+        raise FileExistsError("[Machado]: Migration directory already exists.")
 
     os.makedirs(migration_dir)
 
@@ -32,8 +32,8 @@ def main(migration_path: str) -> None:
         with open(config_file, "w") as file:
             file.write(file_content)
 
-        print(f"Configuration file created.")
-        print(f"Migration directory created.")
+        print(f"[Machado]: Configuration file created.")
+        print(f"[Machado]: Migration directory created.")
 
     except Exception as error:
         if os.path.exists(config_file):

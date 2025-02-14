@@ -2,6 +2,8 @@ import argparse
 
 from machado.commands.test import connection_test
 from machado.config.initialize_env import main as initialize_main
+from machado.commands.apply import main as apply_migrations
+from machado.commands.new import main as new_migration
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Database migration with style.")
@@ -14,17 +16,20 @@ def main() -> None:
     )
 
     apply_parser = subparsers.add_parser("apply")
-    apply_parser.add_argument("--version", type=str, help="Version to apply.")
+    apply_parser.add_argument("-v", "--version", type=str, help="Version to apply.")
 
     test_parser = subparsers.add_parser("test")
-    test_parser.add_argument("--connection", action="store_true", help="Test connection with database.")
+    test_parser.add_argument("-c", "--connection", action="store_true", help="Test connection with database.")
 
     new_migration_parser = subparsers.add_parser("new")
 
-    group = new_migration_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--sql", type=str, help="Initialize a new migration with SQL script.")
-    group.add_argument("--py", type=str, help="Initialize a new migration with Python script.")
+    new_migration_parser.add_argument(
+        "type", choices=["sql", "py"], help="Type of migration script (sql or py)."
+    )
 
+    new_migration_parser.add_argument(
+        "-m", "--message", type=str, required=True, help="Migration description."
+    )
 
     args = parser.parse_args()
 
@@ -34,9 +39,6 @@ def main() -> None:
         if args.connection:
             connection_test()
     if args.command == "apply":
-        # do X
-        pass
+        apply_migrations()
     if args.command == "new":
-        # do Y
-        pass
-
+        new_migration(args.type, args.message)
