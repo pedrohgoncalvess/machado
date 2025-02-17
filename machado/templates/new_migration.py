@@ -6,8 +6,8 @@ After: $after
 User: $user
 """
 "$example sep$"
-from machado.base import table, column
-from machado.types import numeric, varchar, integer
+from machado.sql.base import table, column
+from machado.sql.types import numeric, varchar, integer
 
 # usage example
 example = table(
