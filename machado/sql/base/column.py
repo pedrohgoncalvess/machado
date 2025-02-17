@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 
 def column(
@@ -9,7 +9,7 @@ def column(
     unique: bool = False,
     default: any = None,
     extra_constraints: list[str] = None
-) -> str:
+) -> tuple[str, Callable[..., dict]]:
     """
     Base function to build column definitions with common parameters.
     """
@@ -30,4 +30,9 @@ def column(
     if extra_constraints:
         constraints.extend(extra_constraints)
 
-    return " ".join([base] + constraints)
+    def metadata():
+        return {
+            "name": name,
+        }
+
+    return " ".join([base] + constraints), metadata

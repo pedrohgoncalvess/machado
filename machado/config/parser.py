@@ -9,6 +9,8 @@ import configparser
 import os.path
 from configparser import NoSectionError
 
+from machado.utils.path_config import project
+
 
 class ConfigParser:
     """Configuration file parser that provides access to application settings."""
@@ -21,10 +23,10 @@ class ConfigParser:
             config_file (str): Path to the configuration file.
         """
         self.config = configparser.ConfigParser()
-        self.config_file = config_file
+        self.config_file = f"{project}\\{config_file}"
         self._load_config_()
 
-        if not os.path.exists(config_file):
+        if not os.path.exists(self.config_file):
             raise Exception("Configuration file not found. Try machado init command.")
 
     def _load_config_(self) -> None:
@@ -60,7 +62,8 @@ class ConfigParser:
         migration_config = self.config["migration"]
 
         return {
-            "py_example": False if migration_config.get("py_example") == "false" else True
+            "py_example": False if migration_config.get("py_example") == "false" else True,
+            "user": "default" if migration_config.get("user") is None else migration_config.get("user")
         }
 
     def database_config(self) -> dict[str, any]:
