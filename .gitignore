@@ -8,6 +8,7 @@
 # Project organization
 
 machado.conf
+machado.example.conf
 migration
 
 .ipynb_checkpoints
