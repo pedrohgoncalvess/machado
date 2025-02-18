@@ -1,6 +1,8 @@
 import importlib
 from urllib.parse import urlparse
 
+from black import datetime
+
 from machado.config.parser import ConfigParser
 from machado.utils.env_var import load_env, get_env_var
 
@@ -9,6 +11,7 @@ class Connection:
     def __init__(self):
         main_config = ConfigParser()
         self.project_configs = main_config.project_config()
+        self.table_name = main_config.database_config().get("table_name")
 
         env_path = self.project_configs.get("env_path")
         if env_path:
@@ -22,10 +25,17 @@ class Connection:
         self.db_url = self.db_configs.get("url")
         self.db_type, self.driver = self._db_type_()
 
-        self._connection_ = None
+        self._v_connection_ = None
 
 
-    def connection(self):
+    def test_connection(self):
+        try:
+            self._connection_()
+        except Exception as error: # TODO: Specify errors
+            raise ConnectionError("[Machado]: Unable to establish connection with the database.")
+
+
+    def _connection_(self):
         try:
             lib_driver = importlib.import_module(self.driver)
         except ImportError:
@@ -45,13 +55,44 @@ class Connection:
         return lib_driver.connect(connection_params)
 
 
+    def insert_migration(
+            self,
+            project: str,
+            description: str,
+            version: str,
+            hash_statement: str,
+    ) -> None:
+        with self as conn:
+            try:
+                conn.cursor().execute(f"""
+                insert into {self.table_name} (project, description, version, hash_statement) 
+                values ((%s), (%s), (%s), (%s))
+                """, (project, description, version, hash_statement))
+                conn.commit()
+            except Exception as error: #TODO: Specify errors
+                conn.rollback()
+                raise ValueError(f"[Machado]: Cannot insert migration. {error}")
+
+
+    def change_migration_status(self, project: str, version: str, status: str, time_elapsed: datetime.time) -> None:
+        with self as conn:
+            try:
+                conn.cursor().execute(f"""
+                update {self.table_name} set status = (%s), time_elapsed = (%s) where project = (%s) and version = (%s)
+                """, (status, time_elapsed, project, version))
+                conn.commit()
+            except Exception as error: # TODO: Specify errors
+                conn.rollback()
+                raise ValueError(f"[Machado]: Cannot update migration. {error}")
+
+
     def __enter__(self):
-        self._connection_ = self.connection()
-        return self._connection_
+        self._v_connection_ = self._connection_()
+        return self._v_connection_
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        return self._connection_.close()
+        return self._v_connection_.close()
 
 
     def _create_dsn_(self, params: dict | str):
