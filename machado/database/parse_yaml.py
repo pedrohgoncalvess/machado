@@ -5,7 +5,7 @@ from machado.database.connection import Connection
 from machado.utils.path_config import project_root
 
 
-def extract_sql_commands() -> list[tuple[str, str]]:
+def extract_sql_commands() -> list[tuple[str, str, bool]]:
     """
     Extracts SQL commands and their descriptions from a YAML file.
 
@@ -27,9 +27,10 @@ def extract_sql_commands() -> list[tuple[str, str]]:
 
         for entry in commands:
             if isinstance(entry, dict) and "description" in entry and "command" in entry:
-                description = entry["description"]
+                description = entry["description"].format(table_name=db_configs.get("table_name"))
                 command = entry["command"].format(table_name=db_configs.get("table_name"))
-                processed_commands.append((description, command))
+                raise_if_exists = entry["raise_if_exists"]
+                processed_commands.append((description, command, raise_if_exists))
 
         return processed_commands
 
