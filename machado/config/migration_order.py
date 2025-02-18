@@ -6,7 +6,7 @@ from machado.config.parser import ConfigParser
 from machado.utils.path_config import project
 
 
-def migrations_order():
+def migration_order():
 
     main_config = ConfigParser()
     project_configs = main_config.project_config()
@@ -58,7 +58,7 @@ def migrations_order():
 
     while queue:
         current_id = queue.popleft()
-        sorted_ids.append(current_id)
+        sorted_ids.append((current_id, all_ids[current_id]))
 
         for dependent in dependencies[current_id]:
             in_degree[dependent] -= 1
