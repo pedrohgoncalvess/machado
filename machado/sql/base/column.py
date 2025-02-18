@@ -33,6 +33,7 @@ def column(
     def metadata():
         return {
             "name": name,
+            "valid_stmt": False
         }
 
     return " ".join([base] + constraints), metadata
