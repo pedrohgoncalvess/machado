@@ -4,7 +4,7 @@ from datetime import datetime
 
 import shortuuid
 
-from machado.config.migrations_order import migrations_order
+from machado.config.migration_order import migration_order
 from machado.config.parser import ConfigParser
 from machado.utils.path_config import project_root, project
 
@@ -18,7 +18,7 @@ def main(file_type: str, message: str) -> None:
 
     migration_dir_path = project_configs.get("migration_path")
 
-    order = migrations_order()
+    order = migration_order()
 
     after = order[-1] if len(order) > 0 else None
 

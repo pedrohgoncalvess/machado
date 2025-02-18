@@ -2,26 +2,37 @@ postgresql:
   create-db-env:
     - description: "Creating extension uuid-ossp"
       command: CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      raise_if_exists: false
 
     - description: "Creating function to generate composite ID"
       command: |
-        CREATE OR REPLACE FUNCTION generate_{table_name}_id_compost(name VARCHAR, version INTEGER) 
+        CREATE OR REPLACE FUNCTION generate_{table_name}_id_compost(project VARCHAR, version VARCHAR) 
         RETURNS VARCHAR AS $$
           BEGIN
-            RETURN name || '-' || version::varchar;
+            RETURN project || '-' || version;
           END;
         $$ LANGUAGE PLPGSQL IMMUTABLE;
+      raise_if_exists: false
+
+    - description: "Creating status type"
+      command: |
+        CREATE TYPE {table_name}_status AS ENUM ('processing', 'processed', 'failed');
+      raise_if_exists: false
 
     - description: "Creating table {table_name}"
       command: |
         CREATE TABLE {table_name} (
           id UUID NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
-          name VARCHAR(60) NOT NULL,
           project VARCHAR(40) NOT NULL,
-          version INTEGER NOT NULL,
-          hash_statement VARCHAR(1024) NOT NULL,
+          description TEXT NOT NULL,
+          version CHAR(6) NOT NULL,
+          hash_statement CHAR(64) NOT NULL,
+          time_elapsed TIME,
+          status {table_name}_status NOT NULL DEFAULT 'processing',
           applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          id_compost VARCHAR(70) UNIQUE NOT NULL GENERATED ALWAYS AS (generate_{table_name}_id_compost(name, version)) STORED,
+          applied_rollback BOOLEAN NOT NULL DEFAULT FALSE,
+          id_compost VARCHAR(70) UNIQUE NOT NULL GENERATED ALWAYS AS (generate_{table_name}_id_compost(project, version)) STORED,
         
           CONSTRAINT {table_name}_pk PRIMARY KEY ("id")
         );
+      raise_if_exists: true

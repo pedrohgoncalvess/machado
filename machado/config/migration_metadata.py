@@ -62,11 +62,11 @@ def migration_metadata(shortuuid: str) -> dict:
                 user_match = user_pattern.search(content)
 
                 file_info = {
-                    "ID": id_match.group(1) if id_match else None,
-                    "Created at": created_at_match.group(1) if created_at_match else None,
-                    "Description": description_match.group(1) if description_match else None,
-                    "After": after_match.group(1) if after_match else None,
-                    "User": user_match.group(1) if user_match else None
+                    "id": id_match.group(1) if id_match else None,
+                    "created": created_at_match.group(1) if created_at_match else None,
+                    "description": description_match.group(1) if description_match else None,
+                    "after": after_match.group(1) if after_match else None,
+                    "user": user_match.group(1) if user_match else None
                 }
 
                 return file_info
